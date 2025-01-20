@@ -1,0 +1,54 @@
+{
+  "name": "weeba",
+  "path": "/weeba",
+  "sections": [
+    {
+      "__resolveType": "website/sections/Rendering/Lazy.tsx",
+      "section": {
+        "__resolveType": "site/sections/MovieBanner.tsx",
+        "categories": [
+          {
+            "category": "aasdasdsa",
+            "image": "https://data.decoassets.com/alagacate/634e1d0b-7d8b-44cf-9464-64a43db36cca/pexels-enginakyurt-1487712.jpg",
+            "name": "a"
+          },
+          {
+            "category": "aasdasdsa",
+            "image": "https://data.decoassets.com/alagacate/634e1d0b-7d8b-44cf-9464-64a43db36cca/pexels-enginakyurt-1487712.jpg",
+            "name": "a"
+          },
+          {
+            "category": "aasdasdsa",
+            "image": "https://data.decoassets.com/alagacate/634e1d0b-7d8b-44cf-9464-64a43db36cca/pexels-enginakyurt-1487712.jpg",
+            "name": "a"
+          },
+          {
+            "category": "aasdasdsa",
+            "image": "https://data.decoassets.com/alagacate/634e1d0b-7d8b-44cf-9464-64a43db36cca/pexels-enginakyurt-1487712.jpg",
+            "name": "a"
+          },
+          {
+            "category": "aasdasdsa",
+            "image": "https://data.decoassets.com/alagacate/634e1d0b-7d8b-44cf-9464-64a43db36cca/pexels-enginakyurt-1487712.jpg",
+            "name": "a"
+          },
+          {
+            "category": "aasdasdsa",
+            "image": "https://data.decoassets.com/alagacate/634e1d0b-7d8b-44cf-9464-64a43db36cca/pexels-enginakyurt-1487712.jpg",
+            "name": "a"
+          }
+        ],
+        "background": "https://data.decoassets.com/alagacate/f050bbf0-002e-440f-841a-4e2a01d265dd/pexels-hngstrm-3137890.jpg",
+        "featured": {
+          "poster": "https://data.decoassets.com/alagacate/7a88b5c2-3477-4e28-8e09-f2a3b8b9754e/ca11daeac999969feee8e4c0e6e9234b_12b34982-2b14-481e-bd7b-1a408b23056a_480x.progressive.jpg",
+          "title": "Back to the Future",
+          "description": "Marty McFly, a 17-year-old high school student, is accidentally sent 30 years into the past in a time-traveling DeLorean invented by his close friend, the maverick scientist Doc Brown."
+        }
+      }
+    }
+  ],
+  "seo": {
+    "__resolveType": "website/sections/Seo/SeoV2.tsx"
+  },
+  "__resolveType": "website/pages/Page.tsx"
+}

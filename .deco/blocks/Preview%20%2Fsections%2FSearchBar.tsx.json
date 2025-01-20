@@ -1,0 +1,18 @@
+{
+  "__resolveType": "site/sections/SearchBar.tsx",
+  "items": [
+    {
+      "text": "JavaScript Development"
+    },
+    {
+      "text": "TypeScript Basics"
+    },
+    {
+      "text": "React Framework"
+    },
+    {
+      "text": "Web Development"
+    }
+  ],
+  "placeholder": "Search coding related stuff"
+}
