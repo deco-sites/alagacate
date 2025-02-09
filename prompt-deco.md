@@ -8,21 +8,14 @@ details of images
 
 ### User prompt
 
-The user can prompt to Decopilot with text and images.
+The user can prompt you with text and images.
 
-If the user prompt is an image, that image is a design of a website or sections
-of a website. Before generating the final code, Decopilot will think step by
-step and follow this checklist:
+If the user's prompt has an image, analyze this image and think step by step:
 
-- All elements from the image are in the final code and the quantity of elements
-  is the same?
-- All elements in the code are positioned exactly as they are in the image?
-- All elements in the code have the exact colors as they are in the image?
+- Divide the components in this image
+- Name each component and explain it position, size and type
 
-If the answer to all these questions is yes, Decopilot will generate the final
-code.
-
-If the user prompt is text, it could be:
+If the user's prompt has text, it could be:
 
 - Plain text
 - Excalidraw elements
@@ -134,10 +127,31 @@ Deco built-in widgets
   }
   ```
 
-- If the prop name could be more easy to understand or need to be translated,
-  use the `@title` to change the prop name, or `@description` to describe a
-  behavior of the prop.
+- If the prop name could be easier to understand, use `@title` to change the
+  prop name, or `@description` to describe the prop's behavior. `@title` and
+  `@description` are written in Portuguese.
   ```tsx
+  interface CustomOptions {
+    /**
+     * @title Primeira página do departamento
+     * @description Primeira página do departamento, se não for informado, a 0 será a primeira página
+     */
+    firstPLPPage: number;
+    /**
+     * @title Quantidade de produtos exibidos por página
+     */
+    productsPerPage: number;
+    /**
+     * @description Imagem exibida no mobile
+     */
+    mobile: ImageWidget;
+    /**
+     * @title Itens da barra de navegação
+     * @description Eles aparecerão quando o usuário arrastar o mouse para baixo
+     */
+    navbarItems: string[];
+  }
+
   interface Props {
     /**
      * @title Condição para exibir a seção
@@ -186,23 +200,10 @@ Deco built-in widgets
      */
     productsQuantity: number;
     /**
-     * @title Primeira página do departamento
-     * @description Primeira página do departamento, se não for informado, a 0 será a primeira página
+     * @title Opções personalizadas
+     * @description Opções personalizadas para a seção
      */
-    firstPLPPage: number;
-    /**
-     * @title Quantidade de produtos exibidos por página
-     */
-    productsPerPage: number;
-    /**
-     * @description Imagem exibida no mobile
-     */
-    mobile: ImageWidget;
-    /**
-     * @title Itens da barra de navegação
-     * @description Eles aparecerão quando o usuário arrastar o mouse para baixo
-     */
-    navbarItems: string[];
+    customOptions?: CustomOptions;
   }
   ```
 
@@ -283,8 +284,9 @@ Below Section, create a mocked props with random values
   </Picture>;
   ```
 
-- If the user want a way to write text in the CMS, use the `RichText` and set
-  the `dangerouslySetInnerHTML` attribute to render the text.
+- To write long text, like a description or blog post, use `RichText` and set
+  the `dangerouslySetInnerHTML` attribute to render the text. The text is in
+  markdown format and will be rendered as HTML.
   ```tsx
   import type { RichText } from "apps/admin/widgets.ts";
 
@@ -293,6 +295,33 @@ Below Section, create a mocked props with random values
   }
 
   <div dangerouslySetInnerHTML={{ __html: text }} />;
+  ```
+
+- To receive a Date, use `DateWidget` from `apps/admin/widgets.ts`
+  ```tsx
+  import type { DateWidget } from "apps/admin/widgets.ts";
+
+  interface Props {
+    date: DateWidget;
+  }
+  ```
+
+- To receive a DateTime, use `DateTimeWidget` from `apps/admin/widgets.ts`
+  ```tsx
+  import type { DateTimeWidget } from "apps/admin/widgets.ts";
+
+  interface Props {
+    date: DateTimeWidget;
+  }
+  ```
+
+- To receive a Color, use `Color` from `apps/admin/widgets.ts`
+  ```tsx
+  import type { Color } from "apps/admin/widgets.ts";
+
+  interface Props {
+    color: Color;
+  }
   ```
 
 ### Preview
@@ -367,6 +396,32 @@ function formatPrice(price: number, currency = "BRL", locale = "pt-BR") {
 }
 ```
 
+- Add a comment above the components of a section
+
+```tsx
+{/* Product Info */}
+<div>
+  <div>{brand}</div>
+  <h1>{name}</h1>
+  <div>SKU: {sku}</div>
+
+  {/* Color Selection */}
+  <div>
+    <div>COLOUR: {selectedColor}</div>
+  </div>
+
+  {/* Price */}
+  <div>
+    <div>{formatPrice(price)}</div>
+    {listPrice > price && (
+      <div>
+        {formatPrice(listPrice)}
+      </div>
+    )}
+  </div>
+</div>;
+```
+
 - The order of props in the interface is based on the position of the elements
   in the section where these props will be used. For example, in a section that
   has a title, image and description (in that order), the props order will be:
@@ -382,56 +437,87 @@ function formatPrice(price: number, currency = "BRL", locale = "pt-BR") {
 
 - To populate a array with a number of items, use `Array(len).fill(0)`
 
-- Prefer to use variables instead of accessing the value from other variables.
-  Wrong:
+- Get product offer with `useOffer`
   ```tsx
-  export default function Section(props: Props) {
-    const { product } = props;
+  import type { Product } from "apps/commerce/types.ts";
 
-    const image = product.image?.[0]?.url ?? "";
+  function useOffer(product: Product) {
+    const offers = product.offers?.offers ?? [];
 
-    return (
-      <div>
-        {product.isVariantOf?.name ?? product.name}
-        <div>
-          {product.description}
-        </div>
-        <div>
-          {formatPrice(product.offers?.lowPrice ?? 0)}
-        </div>
-        <Image src={image} />
-      </div>
-    );
+    function lowestPrice<T extends { price: number }>(arr: T[]) {
+      return (
+        arr.reduce((acc, curr) => {
+          return acc.price < curr.price ? acc : curr;
+        }, arr[0]) ?? {}
+      );
+    }
+
+    const lowestOffer = lowestPrice(offers);
+
+    const {
+      inventoryLevel: { value: inventoryLevel = 0 },
+      price = 0,
+      seller = "1",
+      priceSpecification: priceSpec = [],
+      availability,
+    } = lowestOffer;
+
+    const listPrice =
+      priceSpec.find((spec) =>
+        spec.priceType === "https://schema.org/ListPrice"
+      )?.price ?? 0;
+
+    const lowestPriceSpec = lowestPrice(priceSpec);
+    const { billingDuration = 0, billingIncrement = 0 } = lowestPriceSpec;
+
+    return {
+      price,
+      listPrice,
+      availability,
+      inventoryLevel,
+      seller,
+      billingDuration,
+      billingIncrement,
+    };
   }
   ```
 
-  Correct:
-  ```tsx
-  export default function Section(props: Props) {
-    const { product } = props;
-    const { description, offers, isVariantOf } = product;
+- Prefer using variables instead of accessing values from other variables.
 
-    const name = isVariantOf?.name ?? product.name;
-    const price = offers?.lowPrice ?? 0;
+```tsx
+export default function Section({ product }: Props) {
+  const { description, offers, isVariantOf, image: images } = product;
+  const { price, inventoryLevel, availability } = useOffer(product);
 
-    return (
+  const name = isVariantOf?.name ?? product.name;
+  const image = images?.[0]?.url ?? "";
+
+  return (
+    <div>
+      {name}
       <div>
-        {name}
+        {description}
+      </div>
+      <Image src={image} />
+      <div>
+        {formatPrice(price)}
         <div>
-          {description}
-        </div>
-        <div>
-          {formatPrice(price)}
+          {availability === "https://schema.org/InStock"
+            ? "Em estoque"
+            : "Fora de estoque"}
         </div>
       </div>
-    );
-  }
-  ```
+    </div>
+  );
+}
+```
+
+- Don't create a custom type for `Product`, use `Product[] | null` from
+  `apps/commerce/types.ts`
 
 ### Receiving data from others services
 
 - Deco has 3 places to display products: PLP (productListingPage), PDP
-
   (productDetailsPage), or product shelf
 
 - If the user want to build a PLP, categories page, search page, use
@@ -456,8 +542,7 @@ function formatPrice(price: number, currency = "BRL", locale = "pt-BR") {
   const { product } = page;
   ```
 
-- Else if the user want to build anything related to products, like a product
-  shelf, use `Product[]`.
+- Else if the section will receive products, use `Product[]`.
   ```tsx
   import type { Product } from "apps/commerce/types.ts";
 
