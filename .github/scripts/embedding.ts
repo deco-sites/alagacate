@@ -1,7 +1,7 @@
 import { Namespace, Turbopuffer } from "npm:@turbopuffer/turbopuffer";
 import { Mistral } from 'npm:@mistralai/mistralai'
 import { SDKError } from 'npm:@mistralai/mistralai/models/errors/index.js'
-import fg from 'npm:fast-glob'
+import { glob } from 'npm:tinyglobby'
 
 function splitInChunks(input: string, chunkSize = 1024) {
     const chunks = [] as string[]
@@ -101,8 +101,11 @@ const ns = turbopuffer.namespace(`site-1-${REPO_NAME}`);
 
 
 if (!(await namespaceExists(ns))) {
-    const files = await fg('./**/*.{ts,tsx,js,jsx,css}')
-    console.log(files)
+    const files = await glob('./**/*.{ts,tsx,js,jsx,css}', { ignore: ['README.md', 'LICENSE']})
+    
+    for (const file of files) {
+        console.log(file)
+    }
 }
 
 
