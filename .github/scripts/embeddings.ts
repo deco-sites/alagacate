@@ -1,7 +1,6 @@
-import { basename } from "jsr:@std/path";
 import { readFile } from "node:fs/promises";
 import { SDKError } from "npm:@mistralai/mistralai/models/errors/index.js";
-import { Vector } from "npm:@turbopuffer/turbopuffer";
+import { nanoid } from "npm:nanoid";
 import { glob } from "npm:tinyglobby";
 import { formatNamespace, setupMistral, setupTurbopuffer } from "../utils.ts";
 
@@ -132,30 +131,13 @@ const contents = await Promise.all(
 );
 
 const embeddings = await embed(contents);
-const vectorIds = new Set<string>();
-const vectors = [] as Vector[];
-
-for (const { id, embedding } of embeddings) {
-  let n = 0;
-  const content = await readFile(id, "utf-8");
-
-  if (vectorIds.has(id)) {
-    n += 1;
-    while (vectorIds.has(`${id}-${n}`)) n += 1;
-  }
-
-  vectorIds.add(id);
-  vectorIds.add(`${id}-${n}`);
-
-  vectors.push({
-    id: n === 0 ? id : `${id}-${n}`,
-    vector: embedding,
-    attributes: {
-      content: n === 0 ? content : "",
-      contentRef: n === 0 ? "" : id,
-    },
-  });
-}
+const vectors = embeddings.map(({ id, embedding }) => ({
+  id: nanoid(6),
+  vector: embedding,
+  attributes: {
+    path: id,
+  },
+}));
 
 for (const { id } of vectors) {
   console.log(id);
@@ -167,13 +149,8 @@ await ns.upsert({
   vectors,
   distance_metric: "cosine_distance",
   schema: {
-    filename: {
+    path: {
       type: "string",
-      filterable: false,
-    },
-    content: {
-      type: "string",
-      filterable: false,
     },
   },
 });
