@@ -2,7 +2,7 @@ import { basename } from "jsr:@std/path";
 import { readFile } from "node:fs/promises";
 import { Mistral } from "npm:@mistralai/mistralai";
 import { SDKError } from "npm:@mistralai/mistralai/models/errors/index.js";
-import { Namespace, Turbopuffer, Vector } from "npm:@turbopuffer/turbopuffer";
+import { Turbopuffer, Vector } from "npm:@turbopuffer/turbopuffer";
 import { glob } from "npm:tinyglobby";
 
 function splitInChunks(input: string, chunkSize = 1024) {
@@ -108,15 +108,19 @@ const exclude = [
   "manifest.gen.ts",
   "static/adminIcons.ts",
   "sections/Theme/Theme.tsx",
+  ".github",
 ];
 
 if (await namespaceExists()) {
   console.log(`Namespace "${REPO_NAME}" already exists`);
+
   files = ALL_CHANGED_FILES.split(",").filter((file) =>
-    /\.(ts|tsx|js|jsx|css)$/.test(file) && !exclude.includes(file)
+    /\.(ts|tsx|js|jsx|css)$/.test(file) &&
+    !exclude.some((e) => file.startsWith(e))
   );
 } else {
   console.log(`Namespace "${REPO_NAME}" does not exist`);
+
   files = await glob("./**/*.{ts,tsx,js,jsx,css}", { ignore: exclude });
 }
 
