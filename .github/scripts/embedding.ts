@@ -1,9 +1,9 @@
-import { Namespace, Turbopuffer, Vector } from "npm:@turbopuffer/turbopuffer";
+import { basename } from "jsr:@std/path";
+import { readFile } from "node:fs/promises";
 import { Mistral } from "npm:@mistralai/mistralai";
 import { SDKError } from "npm:@mistralai/mistralai/models/errors/index.js";
+import { Namespace, Turbopuffer, Vector } from "npm:@turbopuffer/turbopuffer";
 import { glob } from "npm:tinyglobby";
-import { basename, relative } from "jsr:@std/path";
-import { readFile } from "node:fs/promises";
 
 function splitInChunks(input: string, chunkSize = 1024) {
   const chunks = [] as string[];
@@ -57,7 +57,7 @@ async function embed(inputs: { id: string; content: string }[]) {
         returnEmbeddings.push(...embeddingsChunks);
         allChunksOffset += inputs.length;
 
-        console.log(`Processed [${allChunksOffset}/${allChunks.length}]`);
+        console.log(`Processed chunks [${allChunksOffset}/${allChunks.length}]`);
         break;
       } catch (error) {
         if (error instanceof SDKError) {
@@ -127,7 +127,6 @@ if (!(await namespaceExists(ns))) {
     let n = 0;
     const content = await readFile(id, "utf-8");
 
-    id = relative(Deno.cwd(), id);
     while (vectorIds.has(`${id}-${n}`)) n += 1;
     id = `${id}-${n}`;
 
@@ -140,6 +139,10 @@ if (!(await namespaceExists(ns))) {
         content,
       },
     });
+  }
+
+  for (const { id } of contents) {
+    console.log(id)
   }
 
 //   await ns.upsert({
