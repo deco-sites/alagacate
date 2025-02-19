@@ -62,9 +62,6 @@ async function embed(inputs: { id: string; content: string }[]) {
       } catch (error) {
         if (error instanceof SDKError) {
           if (error.rawResponse.status === 429) {
-            console.log(
-              `[${i}/${MAX_RETRIES}] Rate limited, retrying in 2 seconds...`,
-            );
             await new Promise((resolve) => setTimeout(resolve, 2000));
             continue;
           }
@@ -111,7 +108,9 @@ const mistral = new Mistral({
 const ns = turbopuffer.namespace(`site-1-${REPO_NAME}`);
 
 if (!(await namespaceExists(ns))) {
-  const files = await glob("./**/*.{ts,tsx,js,jsx,css}");
+  const files = await glob("./**/*.{ts,tsx,js,jsx,css}", {
+    ignore: ["static/tailwind.css", "manifest.gen.ts"],
+  });
 
   const contents = await Promise.all(
     files.map(async (file) => ({
@@ -121,10 +120,6 @@ if (!(await namespaceExists(ns))) {
   );
 
   const embeddings = await embed(contents);
-  console.log(
-    embeddings.map(({ id, embedding }) => ({ id, length: embedding.length })),
-  );
-
   const vectorIds = new Set<string>();
   const vectors = [] as Vector[];
 
@@ -146,8 +141,6 @@ if (!(await namespaceExists(ns))) {
       },
     });
   }
-
-  console.log(vectors);
 
 //   await ns.upsert({
 //     vectors,
