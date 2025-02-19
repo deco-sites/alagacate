@@ -15,8 +15,6 @@ function splitInChunks(input: string, chunkSize = 1024) {
   return chunks;
 }
 
-
-
 async function embed(inputs: { id: string; content: string }[]) {
   let allChunksOffset = 0;
   const allChunks = inputs.flatMap(({ id, content }) =>
@@ -57,7 +55,9 @@ async function embed(inputs: { id: string; content: string }[]) {
         returnEmbeddings.push(...embeddingsChunks);
         allChunksOffset += inputs.length;
 
-        console.log(`Processed chunks [${allChunksOffset}/${allChunks.length}]`);
+        console.log(
+          `Processed chunks [${allChunksOffset}/${allChunks.length}]`,
+        );
         break;
       } catch (error) {
         if (error instanceof SDKError) {
@@ -78,7 +78,10 @@ async function embed(inputs: { id: string; content: string }[]) {
   }
 }
 
-const { REPO_NAME, TURBOPUFFER_API_KEY, MISTRAL_API_KEY } = Deno.env.toObject();
+const { REPO_NAME, TURBOPUFFER_API_KEY, MISTRAL_API_KEY, ALL_CHANGED_FILES } = Deno.env.toObject();
+
+console.log(ALL_CHANGED_FILES);
+Deno.exit(0);
 
 if (!REPO_NAME) throw new Error("REPO_NAME is not set");
 if (!TURBOPUFFER_API_KEY) throw new Error("TURBOPUFFER_API_KEY is not set");
@@ -109,7 +112,12 @@ const ns = turbopuffer.namespace(`site-1-${REPO_NAME}`);
 
 if (!(await namespaceExists(ns))) {
   const files = await glob("./**/*.{ts,tsx,js,jsx,css}", {
-    ignore: ["static/tailwind.css", "manifest.gen.ts", "static/adminIcons.ts", "sections/Theme/Theme.tsx"],
+    ignore: [
+      "static/tailwind.css",
+      "manifest.gen.ts",
+      "static/adminIcons.ts",
+      "sections/Theme/Theme.tsx",
+    ],
   });
 
   const contents = await Promise.all(
@@ -142,21 +150,21 @@ if (!(await namespaceExists(ns))) {
   }
 
   for (const { id } of vectors) {
-    console.log(id)
+    console.log(id);
   }
 
-//   await ns.upsert({
-//     vectors,
-//     distance_metric: "cosine_distance",
-//     schema: {
-//       filename: {
-//         type: "string",
-//         filterable: false,
-//       },
-//       content: {
-//         type: "string",
-//         filterable: false,
-//       },
-//     },
-//   });
+  //   await ns.upsert({
+  //     vectors,
+  //     distance_metric: "cosine_distance",
+  //     schema: {
+  //       filename: {
+  //         type: "string",
+  //         filterable: false,
+  //       },
+  //       content: {
+  //         type: "string",
+  //         filterable: false,
+  //       },
+  //     },
+  //   });
 }
