@@ -80,7 +80,7 @@ async function embed(inputs: { id: string; content: string }[]) {
 
 const { REPO_NAME, TURBOPUFFER_API_KEY, MISTRAL_API_KEY, ALL_CHANGED_FILES } = Deno.env.toObject();
 
-console.log(ALL_CHANGED_FILES);
+console.log(ALL_CHANGED_FILES, typeof ALL_CHANGED_FILES);
 Deno.exit(0);
 
 if (!REPO_NAME) throw new Error("REPO_NAME is not set");
