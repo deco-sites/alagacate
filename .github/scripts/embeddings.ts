@@ -147,8 +147,8 @@ for (let { id, embedding } of embeddings) {
     id,
     vector: embedding,
     attributes: {
-      filename: basename(id),
-      content,
+      content: n === 0 ? content : "",
+      contentRef: n === 0 ? "" : id.replace(/-\d+$/g, ""),
     },
   });
 }
