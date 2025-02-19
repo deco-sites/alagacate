@@ -141,7 +141,7 @@ if (!(await namespaceExists(ns))) {
     });
   }
 
-  for (const { id } of contents) {
+  for (const { id } of vectors) {
     console.log(id)
   }
 
