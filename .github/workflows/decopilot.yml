@@ -22,7 +22,7 @@ jobs:
           TURBOPUFFER_API_KEY: ${{ secrets.TURBOPUFFER_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
         run: |
+          echo a
+          echo b
+          echo c
           echo $ALL_CHANGED_FILES
-          for file in ${ALL_CHANGED_FILES}; do
-            echo "$file was changed"
-          done
