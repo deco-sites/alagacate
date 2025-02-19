@@ -88,13 +88,9 @@ if (!MISTRAL_API_KEY) throw new Error("MISTRAL_API_KEY is not set");
 const MAX_RETRIES = 20;
 const MAX_CHARS = 8192;
 
-async function namespaceExists(ns: Namespace) {
-  try {
-    await ns.metadata();
-    return true;
-  } catch {
-    return false;
-  }
+async function namespaceExists() {
+  const { namespaces } = await turbopuffer.namespaces({});
+  return namespaces.some((n) => n.id === `site-${REPO_NAME}`);
 }
 
 const mistral = new Mistral({ apiKey: MISTRAL_API_KEY });
@@ -114,7 +110,7 @@ const exclude = [
   "sections/Theme/Theme.tsx",
 ];
 
-if (await namespaceExists(ns)) {
+if (await namespaceExists()) {
   console.log(`Namespace "${REPO_NAME}" does not exist`);
   files = await glob("./**/*.{ts,tsx,js,jsx,css}", { ignore: exclude });
 } else {
