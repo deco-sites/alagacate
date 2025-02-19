@@ -157,6 +157,8 @@ for (const { id } of vectors) {
   console.log(id);
 }
 
+console.log(`Uploading ${vectors.length} vectors`);
+
 await ns.upsert({
   vectors,
   distance_metric: "cosine_distance",
