@@ -139,7 +139,7 @@ for (const { id, embedding } of embeddings) {
   let n = 0;
   const content = await readFile(id, "utf-8");
 
-  while (vectorIds.has(`${id}-${n}`)) n += 1;
+  while (vectorIds.has(id) || vectorIds.has(`${id}-${n}`)) n += 1;
 
   vectorIds.add(id);
 

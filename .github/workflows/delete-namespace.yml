@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  embeddings:
+  delete-namespace:
     runs-on: ubuntu-latest
     steps:
       - name: Setup checkout
