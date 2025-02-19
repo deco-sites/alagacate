@@ -135,20 +135,20 @@ const embeddings = await embed(contents);
 const vectorIds = new Set<string>();
 const vectors = [] as Vector[];
 
-for (let { id, embedding } of embeddings) {
+for (const { id, embedding } of embeddings) {
   let n = 0;
   const content = await readFile(id, "utf-8");
 
   while (vectorIds.has(`${id}-${n}`)) n += 1;
-  id = `${id}-${n}`;
 
   vectorIds.add(id);
+
   vectors.push({
-    id,
+    id: n === 0 ? id : `${id}-${n}`,
     vector: embedding,
     attributes: {
       content: n === 0 ? content : "",
-      contentRef: n === 0 ? "" : id.replace(/-\d+$/g, ""),
+      contentRef: n === 0 ? "" : id,
     },
   });
 }
