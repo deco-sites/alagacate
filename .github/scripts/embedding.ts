@@ -1,6 +1,6 @@
 import { Namespace, Turbopuffer } from "npm:@turbopuffer/turbopuffer";
 import { Mistral } from 'npm:@mistralai/mistralai'
-import { SDKError } from 'npm:@mistralai/mistralai/models/errors'
+import { SDKError } from 'npm:@mistralai/mistralai/models/errors/index.js'
 import { readdir } from 'node:fs/promises'
 
 function splitInChunks(input: string, chunkSize = 1024) {
