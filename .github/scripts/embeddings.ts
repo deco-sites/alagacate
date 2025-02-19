@@ -139,9 +139,13 @@ for (const { id, embedding } of embeddings) {
   let n = 0;
   const content = await readFile(id, "utf-8");
 
-  while (vectorIds.has(id) && vectorIds.has(`${id}-${n}`)) n += 1;
+  if (vectorIds.has(id)) {
+    n += 1;
+    while (vectorIds.has(`${id}-${n}`)) n += 1;
+  }
 
   vectorIds.add(id);
+  vectorIds.add(`${id}-${n}`);
 
   vectors.push({
     id: n === 0 ? id : `${id}-${n}`,
@@ -157,19 +161,19 @@ for (const { id } of vectors) {
   console.log(id);
 }
 
-console.log(`Uploading ${vectors.length} vectors`);
+// console.log(`Uploading ${vectors.length} vectors`);
 
-await ns.upsert({
-  vectors,
-  distance_metric: "cosine_distance",
-  schema: {
-    filename: {
-      type: "string",
-      filterable: false,
-    },
-    content: {
-      type: "string",
-      filterable: false,
-    },
-  },
-});
+// await ns.upsert({
+//   vectors,
+//   distance_metric: "cosine_distance",
+//   schema: {
+//     filename: {
+//       type: "string",
+//       filterable: false,
+//     },
+//     content: {
+//       type: "string",
+//       filterable: false,
+//     },
+//   },
+// });
