@@ -1,0 +1,25 @@
+name: Delete Namespace
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  embeddings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Delete Namespace
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
+          TURBOPUFFER_API_KEY: ${{ secrets.TURBOPUFFER_API_KEY }}
+        run: |
+          deno run -A .github/scripts/delete-namespace.ts

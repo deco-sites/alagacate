@@ -78,10 +78,8 @@ async function embed(inputs: { id: string; content: string }[]) {
   }
 }
 
-const { REPO_NAME, TURBOPUFFER_API_KEY, MISTRAL_API_KEY, ALL_CHANGED_FILES } = Deno.env.toObject();
-
-console.log(ALL_CHANGED_FILES, typeof ALL_CHANGED_FILES, ALL_CHANGED_FILES.split(","));
-Deno.exit(0);
+const { REPO_NAME, TURBOPUFFER_API_KEY, MISTRAL_API_KEY, ALL_CHANGED_FILES } =
+  Deno.env.toObject();
 
 if (!REPO_NAME) throw new Error("REPO_NAME is not set");
 if (!TURBOPUFFER_API_KEY) throw new Error("TURBOPUFFER_API_KEY is not set");
@@ -99,72 +97,77 @@ async function namespaceExists(ns: Namespace) {
   }
 }
 
+const mistral = new Mistral({ apiKey: MISTRAL_API_KEY });
+
 const turbopuffer = new Turbopuffer({
   apiKey: TURBOPUFFER_API_KEY,
   baseUrl: "https://gcp-us-east4.turbopuffer.com",
 });
 
-const mistral = new Mistral({
-  apiKey: MISTRAL_API_KEY,
-});
+const ns = turbopuffer.namespace(`site-${REPO_NAME}`);
 
-const ns = turbopuffer.namespace(`site-1-${REPO_NAME}`);
+let files = [] as string[];
+const exclude = [
+  "static/tailwind.css",
+  "manifest.gen.ts",
+  "static/adminIcons.ts",
+  "sections/Theme/Theme.tsx",
+];
 
-if (!(await namespaceExists(ns))) {
-  const files = await glob("./**/*.{ts,tsx,js,jsx,css}", {
-    ignore: [
-      "static/tailwind.css",
-      "manifest.gen.ts",
-      "static/adminIcons.ts",
-      "sections/Theme/Theme.tsx",
-    ],
-  });
-
-  const contents = await Promise.all(
-    files.map(async (file) => ({
-      id: file,
-      content: await readFile(file, "utf-8"),
-    })),
+if (await namespaceExists(ns)) {
+  files = ALL_CHANGED_FILES.split(",").filter((file) =>
+    /\.(ts|tsx|js|jsx|css)$/.test(file) && !exclude.includes(file)
   );
-
-  const embeddings = await embed(contents);
-  const vectorIds = new Set<string>();
-  const vectors = [] as Vector[];
-
-  for (let { id, embedding } of embeddings) {
-    let n = 0;
-    const content = await readFile(id, "utf-8");
-
-    while (vectorIds.has(`${id}-${n}`)) n += 1;
-    id = `${id}-${n}`;
-
-    vectorIds.add(id);
-    vectors.push({
-      id,
-      vector: embedding,
-      attributes: {
-        filename: basename(id),
-        content,
-      },
-    });
-  }
-
-  for (const { id } of vectors) {
-    console.log(id);
-  }
-
-  //   await ns.upsert({
-  //     vectors,
-  //     distance_metric: "cosine_distance",
-  //     schema: {
-  //       filename: {
-  //         type: "string",
-  //         filterable: false,
-  //       },
-  //       content: {
-  //         type: "string",
-  //         filterable: false,
-  //       },
-  //     },
-  //   });
+} else {
+  files = await glob("./**/*.{ts,tsx,js,jsx,css}", { ignore: exclude });
 }
+
+console.log(files);
+
+const contents = await Promise.all(
+  files.map(async (file) => ({
+    id: file,
+    content: await readFile(file, "utf-8"),
+  })),
+);
+
+const embeddings = await embed(contents);
+const vectorIds = new Set<string>();
+const vectors = [] as Vector[];
+
+for (let { id, embedding } of embeddings) {
+  let n = 0;
+  const content = await readFile(id, "utf-8");
+
+  while (vectorIds.has(`${id}-${n}`)) n += 1;
+  id = `${id}-${n}`;
+
+  vectorIds.add(id);
+  vectors.push({
+    id,
+    vector: embedding,
+    attributes: {
+      filename: basename(id),
+      content,
+    },
+  });
+}
+
+for (const { id } of vectors) {
+  console.log(id);
+}
+
+//   await ns.upsert({
+//     vectors,
+//     distance_metric: "cosine_distance",
+//     schema: {
+//       filename: {
+//         type: "string",
+//         filterable: false,
+//       },
+//       content: {
+//         type: "string",
+//         filterable: false,
+//       },
+//     },
+//   });
