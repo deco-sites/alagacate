@@ -161,19 +161,19 @@ for (const { id } of vectors) {
   console.log(id);
 }
 
-// console.log(`Uploading ${vectors.length} vectors`);
+console.log(`Uploading ${vectors.length} vectors`);
 
-// await ns.upsert({
-//   vectors,
-//   distance_metric: "cosine_distance",
-//   schema: {
-//     filename: {
-//       type: "string",
-//       filterable: false,
-//     },
-//     content: {
-//       type: "string",
-//       filterable: false,
-//     },
-//   },
-// });
+await ns.upsert({
+  vectors,
+  distance_metric: "cosine_distance",
+  schema: {
+    filename: {
+      type: "string",
+      filterable: false,
+    },
+    content: {
+      type: "string",
+      filterable: false,
+    },
+  },
+});
