@@ -1,9 +1,9 @@
 import { basename } from "jsr:@std/path";
 import { readFile } from "node:fs/promises";
-import { Mistral } from "npm:@mistralai/mistralai";
 import { SDKError } from "npm:@mistralai/mistralai/models/errors/index.js";
-import { Turbopuffer, Vector } from "npm:@turbopuffer/turbopuffer";
+import { Vector } from "npm:@turbopuffer/turbopuffer";
 import { glob } from "npm:tinyglobby";
+import { formatNamespace, setupMistral, setupTurbopuffer } from "../utils.ts";
 
 function splitInChunks(input: string, chunkSize = 1024) {
   const chunks = [] as string[];
@@ -78,32 +78,27 @@ async function embed(inputs: { id: string; content: string }[]) {
   }
 }
 
-const { REPO_NAME, TURBOPUFFER_API_KEY, MISTRAL_API_KEY, ALL_CHANGED_FILES } =
-  Deno.env.toObject();
+async function namespaceExists() {
+  const { namespaces } = await turbopuffer.namespaces({});
+  return namespaces.some((n) => n.id === formatNamespace(REPO_NAME));
+}
+
+// ------------------------------------------------------------
+
+const { REPO_NAME, ALL_CHANGED_FILES } = Deno.env.toObject();
 
 if (!REPO_NAME) throw new Error("REPO_NAME is not set");
-if (!TURBOPUFFER_API_KEY) throw new Error("TURBOPUFFER_API_KEY is not set");
-if (!MISTRAL_API_KEY) throw new Error("MISTRAL_API_KEY is not set");
 
 const MAX_RETRIES = 20;
 const MAX_CHARS = 8192;
 
-async function namespaceExists() {
-  const { namespaces } = await turbopuffer.namespaces({});
-  return namespaces.some((n) => n.id === `site-${REPO_NAME}`);
-}
+const mistral = setupMistral();
+const turbopuffer = setupTurbopuffer();
 
-const mistral = new Mistral({ apiKey: MISTRAL_API_KEY });
-
-const turbopuffer = new Turbopuffer({
-  apiKey: TURBOPUFFER_API_KEY,
-  baseUrl: "https://gcp-us-east4.turbopuffer.com",
-});
-
-const ns = turbopuffer.namespace(`site-${REPO_NAME}`);
+const ns = turbopuffer.namespace(formatNamespace(REPO_NAME));
 
 let files = [] as string[];
-const exclude = [
+const ignore = [
   "static/tailwind.css",
   "manifest.gen.ts",
   "static/adminIcons.ts",
@@ -116,12 +111,12 @@ if (await namespaceExists()) {
 
   files = ALL_CHANGED_FILES.split(",").filter((file) =>
     /\.(ts|tsx|js|jsx|css)$/.test(file) &&
-    !exclude.some((e) => file.startsWith(e))
+    !ignore.some((e) => file.startsWith(e))
   );
 } else {
   console.log(`Namespace "${REPO_NAME}" does not exist`);
 
-  files = await glob("./**/*.{ts,tsx,js,jsx,css}", { ignore: exclude });
+  files = await glob("./**/*.{ts,tsx,js,jsx,css}", { ignore });
 }
 
 if (files.length === 0) {
