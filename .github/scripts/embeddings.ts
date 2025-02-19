@@ -115,14 +115,19 @@ const exclude = [
 ];
 
 if (await namespaceExists(ns)) {
+  console.log("Namespace already exists");
   files = ALL_CHANGED_FILES.split(",").filter((file) =>
     /\.(ts|tsx|js|jsx|css)$/.test(file) && !exclude.includes(file)
   );
 } else {
+  console.log("Namespace does not exist");
   files = await glob("./**/*.{ts,tsx,js,jsx,css}", { ignore: exclude });
 }
 
-console.log(files);
+if (files.length === 0) {
+  console.log("No files to embed, skipping...");
+  Deno.exit(0);
+}
 
 const contents = await Promise.all(
   files.map(async (file) => ({
