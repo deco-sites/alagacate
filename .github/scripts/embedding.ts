@@ -109,7 +109,7 @@ const ns = turbopuffer.namespace(`site-1-${REPO_NAME}`);
 
 if (!(await namespaceExists(ns))) {
   const files = await glob("./**/*.{ts,tsx,js,jsx,css}", {
-    ignore: ["static/tailwind.css", "manifest.gen.ts"],
+    ignore: ["static/tailwind.css", "manifest.gen.ts", "static/adminIcons.ts", "sections/Theme/Theme.tsx"],
   });
 
   const contents = await Promise.all(
