@@ -9,6 +9,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Check if namespace is created
+      - name: Add embeddings
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
         run: |
-          echo ${{ secrets.TURBOPUFFER_API_KEY }}
+          echo $REPO_NAME
