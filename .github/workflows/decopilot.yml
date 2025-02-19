@@ -1,12 +1,18 @@
 name: GitHub Actions Demo
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   embeddings:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: tj-actions/changed-files@v45
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
@@ -16,4 +22,6 @@ jobs:
           TURBOPUFFER_API_KEY: ${{ secrets.TURBOPUFFER_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
         run: |
-          deno run -A .github/scripts/embedding.ts
+          for file in ${ALL_CHANGED_FILES}; do
+            echo "$file was changed"
+          done
