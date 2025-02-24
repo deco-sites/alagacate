@@ -1,33 +1,22 @@
-print(1)
 from functools import partial
-print(2)
 from itertools import batched
-print(3)
-from os import getenv
-print(4)
+from os import getenv, scandir
 from pathlib import Path
-print(5)
 from traceback import print_exc
-print(6)
 
 import turbopuffer as tp
-print(7)
 from cuid2 import Cuid
-print(8)
 from langchain_mistralai import MistralAIEmbeddings
-print(9)
 from langchain_text_splitters import (
     Language,
     RecursiveCharacterTextSplitter,
     RecursiveJsonSplitter,
     TextSplitter,
 )
-print(10)
 from tokenizers import Tokenizer
-print(11)
 from ujson import loads
 
-print('a')
+
 class TSXCodeTextSplitter(RecursiveCharacterTextSplitter):
     def __init__(self, **kwargs):
         html_separators = self.get_separators_for_language(Language.HTML)
@@ -100,16 +89,21 @@ files = []
 
 #     files = [Path(f) for f in ALL_CHANGED_FILES.split(",")]
 # else:
-for root, dirs, files in Path().walk("*"):
-    print(root, dirs, files)
-    for dir in dirs:
-        if dir in exclude_dirs:
-            dirs.remove(dir)
 
-for file in files:
-    files.append(Path(root) / file)
+dirs = ['.']
+while True:
+    if not dirs:
+        break
 
-files = [f for f in files if f.suffix in extensions]
+    with scandir(dirs.pop()) as it:
+        for i in it:
+            p = Path(i)
+
+            if p.is_dir() and not p.name in exclude_dirs:
+                dirs.append(p)
+
+            if p.is_file() and p.suffix in extensions:
+                files.append(p)
 
 if not files:
     print("No files to embed")
