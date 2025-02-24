@@ -84,18 +84,18 @@ def format_namespace(name: str):
 ns = tp.Namespace(format_namespace(REPO_NAME))
 files = []
 
-if ns.exists():
-    print(f"Namespace {REPO_NAME} already exists")
+# if ns.exists():
+#     print(f"Namespace {REPO_NAME} already exists")
 
-    files = [Path(f) for f in ALL_CHANGED_FILES.split(",")]
-else:
-    for root, dirs, files in Path().walk("*"):
-        for dir in dirs:
-            if dir in exclude_dirs:
-                dirs.remove(dir)
+#     files = [Path(f) for f in ALL_CHANGED_FILES.split(",")]
+# else:
+for root, dirs, files in Path().walk("*"):
+    for dir in dirs:
+        if dir in exclude_dirs:
+            dirs.remove(dir)
 
-    for file in files:
-        files.append(Path(root) / file)
+for file in files:
+    files.append(Path(root) / file)
 
 files = [f for f in files if f.suffix in extensions]
 
