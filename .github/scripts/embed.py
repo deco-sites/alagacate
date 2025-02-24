@@ -43,13 +43,7 @@ splitter_by_extension: dict[str, TextSplitter] = {
 }
 
 extensions = list(splitter_by_extension.keys())
-exclude_dirs = {
-    "node_modules",
-    "public",
-    "static",
-    ".github",
-    ".devcontainer"
-}
+exclude_dirs = {"node_modules", "public", "static", ".github", ".devcontainer"}
 
 REPO_NAME = getenv("REPO_NAME")
 ALL_CHANGED_FILES = getenv("ALL_CHANGED_FILES")
@@ -85,26 +79,35 @@ def format_namespace(name: str):
 ns = tp.Namespace(format_namespace(REPO_NAME))
 files = []
 
-# if ns.exists():
-#     print(f"Namespace {REPO_NAME} already exists")
+if ns.exists():
+    print(f"Namespace {REPO_NAME} already exists")
 
-#     files = [Path(f) for f in ALL_CHANGED_FILES.split(",")]
-# else:
+    files = [
+        i
+        for i in (Path(f) for f in ALL_CHANGED_FILES.split(","))
+        if i.is_file() and i.suffix in extensions
+    ]
 
-dirs = ['.']
-while True:
-    if not dirs:
-        break
+    print('Changed files', len(files))
+    for i in files:
+        print(i)
+else:
+    print(f'Namespace {REPO_NAME} does not exist')
 
-    with scandir(dirs.pop()) as it:
-        for i in it:
-            p = Path(i)
+    dirs = ['.']
+    while True:
+        if not dirs:
+            break
 
-            if p.is_dir() and not p.name in exclude_dirs:
-                dirs.append(p)
+        with scandir(dirs.pop()) as it:
+            for i in it:
+                p = Path(i)
 
-            if p.is_file() and p.suffix in extensions:
-                files.append(p)
+                if p.is_dir() and not p.name in exclude_dirs:
+                    dirs.append(p)
+
+                if p.is_file() and p.suffix in extensions:
+                    files.append(p)
 
 if not files:
     print("No files to embed")
