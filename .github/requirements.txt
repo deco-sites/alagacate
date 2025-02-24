@@ -3,9 +3,6 @@ cuid2
 langchain-mistralai
 langchain-text-splitters
 pinecone[grpc]
-python-dotenv
-rich
 turbopuffer
 ujson
 voyageai
-wcmatch
