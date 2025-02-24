@@ -90,6 +90,7 @@ files = []
 #     files = [Path(f) for f in ALL_CHANGED_FILES.split(",")]
 # else:
 for root, dirs, files in Path().walk("*"):
+    print(root, dirs, files)
     for dir in dirs:
         if dir in exclude_dirs:
             dirs.remove(dir)
