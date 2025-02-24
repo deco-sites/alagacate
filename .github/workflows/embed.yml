@@ -25,6 +25,7 @@ jobs:
         with:
           cache: 'pip'
           python-version: '3.13' 
+          cache-dependency-path: ".github/embed-requirements.txt"
 
       - name: Install dependencies
         run: pip install -r .github/embed-requirements.txt
