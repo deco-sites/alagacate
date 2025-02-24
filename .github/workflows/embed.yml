@@ -27,7 +27,7 @@ jobs:
           python-version: '3.13' 
 
       - name: Install dependencies
-        run: pip install -r .github/requirements.txt
+        run: pip install -r .github/embed-requirements.txt
 
       - name: Embedding files
         env:
