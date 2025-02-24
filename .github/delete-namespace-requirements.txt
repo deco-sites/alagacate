@@ -1,1 +1,2 @@
 turbopuffer
+typing-extensions
