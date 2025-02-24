@@ -73,19 +73,19 @@ tp.api_base_url = "https://gcp-us-east4.turbopuffer.com"
 
 
 ns = tp.Namespace(f'site-{REPO_NAME}')
-files = []
+all_files = []
 
 if ns.exists():
     print(f"Namespace {REPO_NAME} already exists")
 
-    files = [
+    all_files = [
         i
         for i in (Path(f) for f in ALL_CHANGED_FILES.split(","))
         if i.is_file() and i.suffix in extensions
     ]
 
-    print('Changed files', len(files))
-    for i in files:
+    print('Changed files', len(all_files))
+    for i in all_files:
         print(i)
 else:
     print(f'Namespace {REPO_NAME} does not exist')
@@ -103,16 +103,18 @@ else:
                     dirs.append(p)
 
                 if p.is_file() and p.suffix in extensions:
-                    files.append(p)
+                    all_files.append(p)
 
-if not files:
+if not all_files:
     print("No files to embed")
     exit(0)
 
 n = 0
 files_embeddings = []
 
-for files in batched(files, 20):
+print('Embedding files')
+
+for files in batched(all_files, 20):
     chunks = []
     chunks_by_file = {}
     current_chunk_index = 0
@@ -138,7 +140,7 @@ for files in batched(files, 20):
         chunks_by_file[file.as_posix()] = chks
         n += 1
 
-    print(f"{n}/{len(files)}", len(chunks))
+    print(f"{n}/{len(all_files)}", len(chunks))
 
     vectors = embeddings.embed_documents(chunks)
 
