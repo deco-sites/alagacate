@@ -14,7 +14,7 @@ from langchain_text_splitters import (
     TextSplitter,
 )
 from tokenizers import Tokenizer
-from ujson import loads
+from ujson import loads, JSONDecodeError
 
 
 class TSXCodeTextSplitter(RecursiveCharacterTextSplitter):
@@ -48,6 +48,7 @@ exclude_dirs = {
     "public",
     "static",
     ".github",
+    ".devcontainer"
 }
 
 REPO_NAME = getenv("REPO_NAME")
@@ -122,7 +123,11 @@ for files in batched(files, 20):
 
         try:
             if file.suffix == ".json":
-                chks = splitter(loads(file.read_text(encoding="utf-8")))
+                try:
+                    chks = splitter(loads(file.read_text(encoding="utf-8")))
+                except JSONDecodeError:
+                    print(f"Error decoding json file {file.as_posix()}")
+                    continue
             else:
                 chks = splitter(file.read_text(encoding="utf-8"))
         except Exception:
