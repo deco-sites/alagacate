@@ -139,10 +139,6 @@ const vectors = embeddings.map(({ id, embedding }) => ({
   },
 }));
 
-for (const { id } of vectors) {
-  console.log(id);
-}
-
 console.log(`Uploading ${vectors.length} vectors`);
 
 await ns.upsert({

@@ -1,6 +1,6 @@
 name: Delete Namespace
 
-on: 
+on:
   workflow_dispatch:
 
 jobs:
