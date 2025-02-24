@@ -12,8 +12,7 @@ jobs:
   embedding:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -27,7 +26,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           cache: 'pip'
-          python-version: '3.13' 
+          python-version: '3.12' 
 
       - name: Install dependencies
         run: |
