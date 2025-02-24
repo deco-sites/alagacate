@@ -1,4 +1,4 @@
-name: Embed files
+name: Embed
 
 on:
   push:
@@ -13,8 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup get changed files
         uses: tj-actions/changed-files@v45
@@ -29,8 +27,7 @@ jobs:
           python-version: '3.13' 
 
       - name: Install dependencies
-        run: |
-          pip install -r .github/requirements.txt
+        run: pip install -r .github/requirements.txt
 
       - name: Embedding files
         env:
@@ -38,5 +35,4 @@ jobs:
           TURBOPUFFER_API_KEY: ${{ secrets.TURBOPUFFER_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
-        run: |
-          python .github/scripts/embed.py
+        run: python .github/scripts/embed.py

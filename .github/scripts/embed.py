@@ -72,11 +72,7 @@ tp.api_key = getenv("TURBOPUFFER_API_KEY")
 tp.api_base_url = "https://gcp-us-east4.turbopuffer.com"
 
 
-def format_namespace(name: str):
-    return f'site-{name}'
-
-
-ns = tp.Namespace(format_namespace(REPO_NAME))
+ns = tp.Namespace(f'site-{REPO_NAME}')
 files = []
 
 if ns.exists():
