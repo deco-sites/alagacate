@@ -163,6 +163,8 @@ for files in batched(all_files, 20):
             )
             current_chunk_index += 1
 
+print([i['attributes']['path'] for i in files_embeddings])
+
 print(f"Upserting {len(files_embeddings)} vectors")
 
 ns.upsert(

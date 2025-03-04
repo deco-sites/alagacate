@@ -23,8 +23,8 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v5
         with:
-          cache: 'pip'
-          python-version: '3.13' 
+          cache: "pip"
+          python-version: "3.13"
           cache-dependency-path: ".github/embed-requirements.txt"
 
       - name: Install dependencies
