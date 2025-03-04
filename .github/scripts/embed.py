@@ -44,6 +44,7 @@ splitter_by_extension: dict[str, TextSplitter] = {
 
 extensions = list(splitter_by_extension.keys())
 exclude_dirs = {"node_modules", "public", "static", ".github", ".devcontainer"}
+exclude_files = {"manifest.gen.ts", "sections/Theme/Theme.tsx", "fresh.gen.ts"}
 
 REPO_NAME = getenv("REPO_NAME")
 ALL_CHANGED_FILES = getenv("ALL_CHANGED_FILES")
@@ -52,9 +53,6 @@ TURBOPUFFER_API_KEY = getenv("TURBOPUFFER_API_KEY")
 
 if not REPO_NAME:
     raise ValueError("REPO_NAME is not set")
-
-if not ALL_CHANGED_FILES:
-    raise ValueError("ALL_CHANGED_FILES is not set")
 
 if not MISTRAL_API_KEY:
     raise ValueError("MISTRAL_API_KEY is not set")
@@ -72,10 +70,70 @@ tp.api_key = getenv("TURBOPUFFER_API_KEY")
 tp.api_base_url = "https://gcp-us-east4.turbopuffer.com"
 
 
-ns = tp.Namespace(f'site-{REPO_NAME}')
-all_files = []
+def embed_files(files: list[Path]):
+    n = 0
+    files_embeddings = []
 
-if ns.exists():
+    for files in batched(files, 20):
+        chunks = []
+        chunks_by_file = {}
+        current_chunk_index = 0
+
+        for file in files:
+            splitter = splitter_by_extension[file.suffix]
+
+            try:
+                if file.suffix == ".json":
+                    try:
+                        chks = splitter(loads(file.read_text(encoding="utf-8")))
+                    except JSONDecodeError:
+                        print(f"Error decoding json file {file.as_posix()}")
+                        continue
+                else:
+                    chks = splitter(file.read_text(encoding="utf-8"))
+            except Exception:
+                print_exc()
+                print(f"Error splitting file {file.as_posix()}")
+                raise
+
+            chunks.extend(chks)
+            chunks_by_file[file.as_posix()] = chks
+            n += 1
+
+        print(f"{n}/{len(all_files)}", len(chunks))
+
+        vectors = embeddings.embed_documents(chunks)
+
+        for file in files:
+            file_chunks = chunks_by_file.get(file.as_posix(), None)
+
+            if not file_chunks:
+                continue
+
+            for chunk in file_chunks:
+                files_embeddings.append(
+                    {
+                        "id": cuid.generate(10),
+                        "vector": vectors[current_chunk_index],
+                        "attributes": {
+                            "path": file.as_posix(),
+                            "content": chunk,
+                        },
+                    }
+                )
+                current_chunk_index += 1
+
+    return files_embeddings
+
+
+ns_code = tp.Namespace(f'site-{REPO_NAME}-code')
+ns_blocks = tp.Namespace(f'site-{REPO_NAME}-blocks')
+
+all_files = []
+code_files = []
+blocks_files = []
+
+if ns_code.exists() and ns_blocks.exists():
     print(f"Namespace {REPO_NAME} already exists")
 
     all_files = [
@@ -109,68 +167,26 @@ if not all_files:
     print("No files to embed")
     exit(0)
 
-n = 0
-files_embeddings = []
+all_files = [i for i in all_files if not any(i.match(f) for f in exclude_files)]
+
+for i in all_files:
+    is_in_deco_folder = i.parts[0] == '.deco'
+
+    if is_in_deco_folder:
+        blocks_files.append(i)
+    else:
+        code_files.append(i)
+
 
 print('Embedding files')
+code_embeddings = embed_files(code_files)
+blocks_embeddings = embed_files(blocks_files)
 
-for files in batched(all_files, 20):
-    chunks = []
-    chunks_by_file = {}
-    current_chunk_index = 0
+print(f"Upserting {len(code_embeddings) + len(blocks_embeddings)} vectors")
 
-    for file in files:
-        splitter = splitter_by_extension[file.suffix]
-
-        try:
-            if file.suffix == ".json":
-                try:
-                    chks = splitter(loads(file.read_text(encoding="utf-8")))
-                except JSONDecodeError:
-                    print(f"Error decoding json file {file.as_posix()}")
-                    continue
-            else:
-                chks = splitter(file.read_text(encoding="utf-8"))
-        except Exception:
-            print_exc()
-            print(f"Error splitting file {file.as_posix()}")
-            raise
-
-        chunks.extend(chks)
-        chunks_by_file[file.as_posix()] = chks
-        n += 1
-
-    print(f"{n}/{len(all_files)}", len(chunks))
-
-    vectors = embeddings.embed_documents(chunks)
-
-    for file in files:
-        file_chunks = chunks_by_file.get(file.as_posix(), None)
-
-        if not file_chunks:
-            continue
-
-        for chunk in file_chunks:
-            files_embeddings.append(
-                {
-                    "id": cuid.generate(10),
-                    "vector": vectors[current_chunk_index],
-                    "attributes": {
-                        "path": file.as_posix(),
-                        "content": chunk,
-                    },
-                }
-            )
-            current_chunk_index += 1
-
-print([i['attributes']['path'] for i in files_embeddings])
-
-print(f"Upserting {len(files_embeddings)} vectors")
-
-ns.upsert(
-    files_embeddings,
-    distance_metric="cosine_distance",
-    schema={
+args = {
+    'distance_metric': 'cosine_distance',
+    'schema': {
         'path': {
             'type': 'string',
             'filterable': False,
@@ -180,4 +196,7 @@ ns.upsert(
             'filterable': False,
         },
     },
-)
+}
+
+ns_code.upsert(code_embeddings, **args)
+ns_blocks.upsert(blocks_embeddings, **args)
