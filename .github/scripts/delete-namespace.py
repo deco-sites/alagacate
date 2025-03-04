@@ -14,12 +14,10 @@ if not TURBOPUFFER_API_KEY:
 tp.api_key = getenv("TURBOPUFFER_API_KEY")
 tp.api_base_url = "https://gcp-us-east4.turbopuffer.com"
 
-ns_code = tp.Namespace(f'site-{REPO_NAME}-code')
-ns_blocks = tp.Namespace(f'site-{REPO_NAME}-blocks')
+ns = tp.Namespace(f'site-{REPO_NAME}')
 
-if not ns_code.exists() or not ns_blocks.exists():
+if not ns.exists():
     print(f"Namespace {REPO_NAME} does not exist")
     exit(0)
 
-ns_code.delete_all()
-ns_blocks.delete_all()
+ns.delete_all()
