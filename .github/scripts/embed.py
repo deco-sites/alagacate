@@ -100,7 +100,7 @@ def embed_files(files: list[Path]):
             chunks_by_file[file.as_posix()] = chks
             n += 1
 
-        print(f"{n}/{len(all_files)}", len(chunks))
+        print(f"{n}/{len(files)}", len(chunks))
 
         vectors = embeddings.embed_documents(chunks)
 
