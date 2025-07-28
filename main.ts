@@ -7,16 +7,4 @@ import { start } from "$fresh/server.ts";
 import config from "./fresh.config.ts";
 import manifest from "./fresh.gen.ts";
 
-
-  ______________
-< miaaaaaaaaaauu >
-  --------------
-         \   ^__^ 
-          \  (oo)\_______
-             (__)\       )\/\\
-                 ||----w |
-                 ||     ||
-    
-
-
 await start(manifest, config);
