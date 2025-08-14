@@ -15,7 +15,7 @@ export default defineApp(async (_req, ctx) => {
   if (_req.url.includes("explosion")) {
     INCOMING_EXPLOSION = [
       ...INCOMING_EXPLOSION,
-      ...Array.from(new Array(25_000_000).keys()),
+      ...Array.from(new Array(1_000_000).keys()),
     ];
     console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaa");
     console.log(INCOMING_EXPLOSION.length);
