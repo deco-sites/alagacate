@@ -1,7 +1,6 @@
 {
   "imports": {
     "$fresh/": "https://deno.land/x/fresh@1.7.3/",
-    "@deco/deno-ast-wasm": "jsr:@deco/deno-ast-wasm@^0.5.5",
     "preact": "npm:preact@10.23.1",
     "preact-render-to-string": "npm:preact-render-to-string@6.4.2",
     "@cliffy/prompt": "jsr:@cliffy/prompt@^1.0.0-rc.5",
@@ -30,6 +29,7 @@
     "@zaubrik/djwt": "jsr:@zaubrik/djwt@^3.0.2",
     "fast-json-patch": "npm:fast-json-patch@^3.1.1",
     "https://esm.sh/*preact-render-to-string@6.3.1": "npm:preact-render-to-string@6.4.2",
+    "@deco/deco": "jsr:@deco/deco@1.108.3",
     "simple-git": "npm:simple-git@^3.25.0",
     "std/": "https://deno.land/std@0.190.0/",
     "deco/": "https://cdn.jsdelivr.net/gh/deco-cx/deco@1.108.3/",
@@ -37,12 +37,11 @@
     "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
     "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
     "daisyui": "npm:daisyui@4.6.0",
-    "@deco/dev": "jsr:@deco/dev@1.108.3",
-    "@deco/deco": "jsr:@deco/deco@^1.121.3"
+    "@deco/dev": "jsr:@deco/dev@1.108.3"
   },
   "tasks": {
-    "aa": "deno run -A --unstable-http --env https://deco.cx/run -- deno task dev",
-    "start": "deno run -A --unstable-http --env-file=.env --config ../deco/deno.json ../deco/scripts/run.ts -- deno task dev",
+    "start": "deno run -A --unstable-http --env https://deco.cx/run -- deno task dev",
+    "aa": "deno run -A --unstable-http --env-file=.env --config ../deco/deno.json ../deco/scripts/run.ts -- deno task dev",
     "gen": "deno run -A dev.ts --gen-only",
     "play": "USE_LOCAL_STORAGE_ONLY=true deno task start",
     "component": "deno eval 'import \"deco/scripts/component.ts\"'",
