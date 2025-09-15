@@ -32,13 +32,13 @@
     "https://esm.sh/*preact-render-to-string@6.3.1": "npm:preact-render-to-string@6.4.2",
     "simple-git": "npm:simple-git@^3.25.0",
     "std/": "https://deno.land/std@0.190.0/",
-    "deco/": "https://cdn.jsdelivr.net/gh/deco-cx/deco@a0d6f3c77e3df5aa2ceaa6136c6fccef79daf163/",
+    "deco/": "https://cdn.jsdelivr.net/gh/deco-cx/deco@1.108.3/",
     "apps/": "https://cdn.jsdelivr.net/gh/deco-cx/apps@0.64.14/",
     "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
     "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
     "daisyui": "npm:daisyui@4.6.0",
     "@deco/dev": "jsr:@deco/dev@1.108.3",
-    "@deco/deco": "https://cdn.jsdelivr.net/gh/deco-cx/deco@a0d6f3c77e3df5aa2ceaa6136c6fccef79daf163/"
+    "@deco/deco": "jsr:@deco/deco@^1.121.3"
   },
   "tasks": {
     "aa": "deno run -A --unstable-http --env https://deco.cx/run -- deno task dev",
