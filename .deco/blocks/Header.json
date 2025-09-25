@@ -55,12 +55,6 @@
     },
     {
       "@type": "SiteNavigationElement",
-      "url": "/foo",
-      "name": "Foo",
-      "children": []
-    },
-    {
-      "@type": "SiteNavigationElement",
       "url": "/activities",
       "name": "Activities",
       "children": []
