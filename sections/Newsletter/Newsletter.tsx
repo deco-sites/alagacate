@@ -53,7 +53,7 @@ function Notice({ title, description }: {
 }
 function Newsletter({
   empty = {
-    title: "Get top deals, latest trends, and more.",
+    title: "Abacate.",
     description:
       "Receive our news and promotions in advance. Enjoy and get 10% off your first purchase. For more information click here.",
   },
